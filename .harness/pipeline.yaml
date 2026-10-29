@@ -1,0 +1,79 @@
+# Clone harness-community/podinfo and push the image to Docker Hub.
+# This pipeline does not deploy. Publish is the teaching surface.
+#
+# Create secrets github-pat and dockerhub-pat, then connectors
+# githubconnector and dockerhubconnector (see connectors/).
+# Paste this pipeline and replace every # REPLACE: line.
+# At runtime, set imageRepo to <YOUR_DOCKERHUB_USER>/podinfo.
+
+pipeline:
+  name: Publish Artifact
+  identifier: publish_artifact
+  # REPLACE
+  projectIdentifier: <YOUR_PROJECT_IDENTIFIER>
+  # REPLACE
+  orgIdentifier: <YOUR_ORG_IDENTIFIER>
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: githubconnector
+        repoName: harness-community/podinfo
+        build:
+          type: branch
+          spec:
+            branch: master
+  variables:
+    - name: imageRepo
+      type: String
+      description: Docker Hub repository, for example myuser/podinfo
+      required: true
+      value: <+input>
+  stages:
+    - stage:
+        name: Publish
+        identifier: publish
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: Build and Push podinfo
+                  identifier: build_and_push_podinfo
+                  timeout: 20m
+                  spec:
+                    connectorRef: dockerhubconnector
+                    repo: <+pipeline.variables.imageRepo>
+                    tags:
+                      - <+pipeline.sequenceId>
+                      - latest
+                    dockerfile: Dockerfile
+                    context: .
+                    caching: true
+              - step:
+                  type: Run
+                  name: Confirm image coordinates
+                  identifier: confirm_image_coordinates
+                  spec:
+                    image: alpine:3.20
+                    shell: Sh
+                    command: |-
+                      set -eu
+                      echo "Pushed tags:"
+                      echo "  docker.io/<+pipeline.variables.imageRepo>:<+pipeline.sequenceId>"
+                      echo "  docker.io/<+pipeline.variables.imageRepo>:latest"
+                      echo "Open Docker Hub and confirm both tags exist on that repository."
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: MarkAsFailure

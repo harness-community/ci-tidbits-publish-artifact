@@ -1,0 +1,31 @@
+# Docker Hub connector — push the image this pipeline builds.
+# Create the Text Secret first:
+#   id: dockerhub-pat
+#   value: a Docker Hub access token (not your account password)
+#          with permission to push to <YOUR_DOCKERHUB_USER>/podinfo
+#   https://docs.docker.com/security/for-developers/access-tokens/
+#
+# Then: Project Settings → Connectors → Docker Registry → paste this YAML.
+# executeOnDelegate: false is required for Harness Cloud build infrastructure.
+
+connector:
+  name: dockerhub-connector
+  identifier: dockerhubconnector
+  description: Docker Hub connector used to push the podinfo image
+  # REPLACE
+  orgIdentifier: <YOUR_ORG_IDENTIFIER>
+  # REPLACE
+  projectIdentifier: <YOUR_PROJECT_IDENTIFIER>
+  type: DockerRegistry
+  spec:
+    dockerRegistryUrl: https://index.docker.io/v2/
+    providerType: DockerHub
+    auth:
+      type: UsernamePassword
+      spec:
+        # REPLACE: your Docker Hub username
+        username: <YOUR_DOCKERHUB_USER>
+        passwordRef: dockerhub-pat
+    executeOnDelegate: false
+    proxy: false
+    ignoreTestConnection: false
