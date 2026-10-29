@@ -15,7 +15,7 @@ flowchart LR
 
 The pipeline clones **[podinfo](https://github.com/harness-community/podinfo)**, builds its Dockerfile, and **pushes** the image to **Docker Hub**. Nobody runs `docker build` or `docker push` in a shell. The native **Build and Push to Docker Registry** step is the publish.
 
-This tidbit does **not** deploy. For clone + push + Kubernetes deploy, see [CD Connector Usage](https://github.com/harness-community/cd-tidbits-connector-usage).
+This tidbit does **not** deploy. To roll an image out to Kubernetes, see [Introduction to Basic CD Deployments](https://university-registration.harness.io/self-paced-training-tidbit-introduction-to-basic-cd-deployments).
 
 ---
 
@@ -203,7 +203,7 @@ Keep the same step type. Point a Docker connector at your Artifactory Docker end
 
 ## What's next?
 
-- **Deploy the tag.** Feed `<+pipeline.sequenceId>` into a Kubernetes (or Helm) stage — the [connector usage tidbit](https://github.com/harness-community/cd-tidbits-connector-usage) does that end to end.
+- **Deploy the tag.** Feed `<+pipeline.sequenceId>` into a Kubernetes (or Helm) stage — [Introduction to Basic CD Deployments](https://university-registration.harness.io/self-paced-training-tidbit-introduction-to-basic-cd-deployments).
 - **Artifactory / GHCR / ECR.** Swap the Docker connector URL or use `BuildAndPushECR` / `BuildAndPushGAR` / `BuildAndPushACR`.
 - **Build without push.** Scan the image before it leaves the build — [build-only and push-only](https://developer.harness.io/docs/continuous-integration/use-ci/build-and-upload-artifacts/build-without-push).
 
